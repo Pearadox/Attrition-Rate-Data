@@ -1,26 +1,30 @@
 import tbapy
 import csv
 
+import datetime
+
 tba = tbapy.TBA('')
 
 teams = tba.teams()
 rows = []
-count = 0
+
+currentYear = datetime.datetime.now().year
+
+rookieYear = 2015
 
 for i in teams:
-    count+=1
-    if count % 5 == 0:
+    if i.team_number % 5 == 0:
         print(".", end="",flush=True)
     try:
         teamInfo = tba.team(i.team_number)
         if ((not teamInfo["rookie_year"] == None)\
-            and (teamInfo["rookie_year"] >= 2015 and teamInfo["state_prov"] == "Texas")):
-            # team number, rookie year, city, state, ?competing this year
+            and (teamInfo["rookie_year"] >= rookieYear and teamInfo["state_prov"] == "Texas")):
+            # team number, rookie year, city, state, competing this year?
             row = [teamInfo["team_number"],
                 teamInfo["rookie_year"],
                 teamInfo["city"],
                 teamInfo["state_prov"],
-                tba.team_years(i.team_number)[-3] == 2023 if len(tba.team_years(i.team_number)) > 0 else False]
+                currentYear in tba.team_years(i.team_number)]
             rows.append(row)
     except Exception as e:
         print(i.team_number, e)
